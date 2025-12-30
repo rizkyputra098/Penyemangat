@@ -43,102 +43,48 @@ const NiaLoveWebsite: React.FC = () => {
     setMounted(true);
   }, []);
 
-  const melodyByEmotion: Record<EmotionType, MelodyNote[]> = {
-    bahagia: [
-      { freq: 392.0, dur: 0.8 }, // G4
-      { freq: 440.0, dur: 0.9 }, // A4
-      { freq: 493.88, dur: 1.0 }, // B4
-      { freq: 440.0, dur: 0.9 },
-      { freq: 392.0, dur: 1.2 },
-    ],
-
-    sedih: [
-      { freq: 261.63, dur: 1.4 }, // C4
-      { freq: 246.94, dur: 1.4 }, // B3
-      { freq: 220.0, dur: 1.6 }, // A3
-      { freq: 196.0, dur: 1.8 }, // G3
-      { freq: 220.0, dur: 1.6 },
-    ],
-
-    marah: [
-      { freq: 293.66, dur: 1.0 }, // D4
-      { freq: 261.63, dur: 1.1 }, // C4
-      { freq: 246.94, dur: 1.2 }, // B3
-      { freq: 261.63, dur: 1.3 },
-      { freq: 293.66, dur: 1.5 },
-    ],
-
-    capek: [
-      { freq: 261.63, dur: 1.8 }, // C4
-      { freq: 293.66, dur: 1.6 }, // D4
-      { freq: 329.63, dur: 2.0 }, // E4
-      { freq: 293.66, dur: 1.6 },
-      { freq: 261.63, dur: 2.2 },
-    ],
-
-    motivasi: [
-      { freq: 329.63, dur: 0.9 }, // E4
-      { freq: 392.0, dur: 1.0 }, // G4
-      { freq: 440.0, dur: 1.2 }, // A4
-      { freq: 493.88, dur: 1.4 }, // B4
-      { freq: 523.25, dur: 1.6 }, // C5
-    ],
-
-    badmood: [
-      { freq: 277.18, dur: 1.4 }, // C#4
-      { freq: 261.63, dur: 1.5 }, // C4
-      { freq: 246.94, dur: 1.6 }, // B3
-      { freq: 261.63, dur: 1.5 },
-      { freq: 277.18, dur: 1.8 },
-    ],
-  };
+  const melodyByEmotion: Record<EmotionType, { label: string; path: string }> =
+    {
+      bahagia: { label: "😊 Bahagia", path: "/music/bahagia.mp3" },
+      sedih: { label: "😢 Sedih", path: "/music/sedih.mp3" },
+      marah: { label: "😠 Marah", path: "/music/marah.mp3" },
+      capek: { label: "😴 Capek", path: "/music/capek.mp3" },
+      motivasi: { label: "🚀 Motivasi", path: "/music/motivasi.mp3" },
+      badmood: { label: "😤 Bad Mood", path: "/music/badmood.mp3" },
+    };
 
   useEffect(() => {
     if (!selectedEmotion) return;
 
-    const audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
-    let isPlaying = true;
-    let noteIndex = 0;
+    let currentAudio: HTMLAudioElement | null = null;
 
-    const playNote = (frequency: number, duration: number): void => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
+    const playMusicFile = (): void => {
+      // Stop audio sebelumnya jika ada
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
 
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
+      const musicData = melodyByEmotion[selectedEmotion];
+      currentAudio = new Audio(musicData.path);
 
-      osc.frequency.value = frequency;
-      osc.type = selectedEmotion === "marah" ? "square" : "sine";
+      currentAudio.loop = true; // Musik berulang
+      currentAudio.volume = 0.5; // Volume 50%
 
-      gain.gain.setValueAtTime(0.08, audioContext.currentTime);
-      gain.gain.exponentialRampToValueAtTime(
-        0.01,
-        audioContext.currentTime + duration
-      );
-
-      osc.start(audioContext.currentTime);
-      osc.stop(audioContext.currentTime + duration);
+      currentAudio.play().catch((err) => {
+        console.error("Error playing audio:", err);
+      });
     };
 
-    const playMelody = (): void => {
-      if (!isPlaying) return;
-
-      const melody = melodyByEmotion[selectedEmotion];
-      const note = melody[noteIndex % melody.length];
-
-      playNote(note.freq, note.dur);
-      noteIndex++;
-
-      setTimeout(() => {
-        if (isPlaying) playMelody();
-      }, note.dur * 1000);
-    };
-
-    playMelody();
+    playMusicFile();
 
     return () => {
-      isPlaying = false;
+      // Cleanup: stop audio saat emotion berubah atau component unmount
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+      }
     };
   }, [selectedEmotion]);
 
