@@ -9,72 +9,91 @@ declare global {
   }
 }
 
-const NiaLoveWebsite = () => {
-  const [stage, setStage] = useState("loading");
-  const [selectedEmotion, setSelectedEmotion] = useState(null);
-  const [openedCards, setOpenedCards] = useState({});
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [mounted, setMounted] = useState(false);
+type EmotionType =
+  | "bahagia"
+  | "sedih"
+  | "marah"
+  | "capek"
+  | "motivasi"
+  | "badmood";
 
-  // Set mounted state to prevent hydration mismatch
+interface MelodyNote {
+  freq: number;
+  dur: number;
+}
+
+interface EmotionStyle {
+  color: string;
+  dark: string;
+  text: string;
+  flower: string;
+}
+
+const NiaLoveWebsite: React.FC = () => {
+  const [stage, setStage] = useState<"loading" | "home">("loading");
+  const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | null>(
+    null
+  );
+  const [openedCards, setOpenedCards] = useState<Record<number, boolean>>({});
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Melodi untuk setiap emosi
-  const melodyByEmotion = {
+  const melodyByEmotion: Record<EmotionType, MelodyNote[]> = {
     bahagia: [
-      { freq: 392.0, dur: 0.3 }, // G
-      { freq: 493.88, dur: 0.3 }, // B
-      { freq: 587.33, dur: 0.3 }, // D
-      { freq: 659.25, dur: 0.4 }, // E
-      { freq: 587.33, dur: 0.3 }, // D
-      { freq: 523.25, dur: 0.3 }, // C
-      { freq: 587.33, dur: 0.5 }, // D
+      { freq: 392.0, dur: 0.3 },
+      { freq: 493.88, dur: 0.3 },
+      { freq: 587.33, dur: 0.3 },
+      { freq: 659.25, dur: 0.4 },
+      { freq: 587.33, dur: 0.3 },
+      { freq: 523.25, dur: 0.3 },
+      { freq: 587.33, dur: 0.5 },
     ],
     sedih: [
-      { freq: 261.63, dur: 0.8 }, // C
-      { freq: 246.94, dur: 0.8 }, // B
-      { freq: 220.0, dur: 1.0 }, // A
-      { freq: 196.0, dur: 0.6 }, // G
-      { freq: 220.0, dur: 1.0 }, // A
-      { freq: 246.94, dur: 0.8 }, // B
+      { freq: 261.63, dur: 0.8 },
+      { freq: 246.94, dur: 0.8 },
+      { freq: 220.0, dur: 1.0 },
+      { freq: 196.0, dur: 0.6 },
+      { freq: 220.0, dur: 1.0 },
+      { freq: 246.94, dur: 0.8 },
     ],
     marah: [
-      { freq: 329.63, dur: 0.2 }, // E
-      { freq: 392.0, dur: 0.2 }, // G
-      { freq: 329.63, dur: 0.2 }, // E
-      { freq: 440.0, dur: 0.3 }, // A
-      { freq: 329.63, dur: 0.2 }, // E
-      { freq: 392.0, dur: 0.4 }, // G
+      { freq: 329.63, dur: 0.2 },
+      { freq: 392.0, dur: 0.2 },
+      { freq: 329.63, dur: 0.2 },
+      { freq: 440.0, dur: 0.3 },
+      { freq: 329.63, dur: 0.2 },
+      { freq: 392.0, dur: 0.4 },
     ],
     capek: [
-      { freq: 261.63, dur: 1.0 }, // C
-      { freq: 293.66, dur: 1.0 }, // D
-      { freq: 329.63, dur: 1.2 }, // E
-      { freq: 293.66, dur: 1.0 }, // D
-      { freq: 261.63, dur: 1.0 }, // C
+      { freq: 261.63, dur: 1.0 },
+      { freq: 293.66, dur: 1.0 },
+      { freq: 329.63, dur: 1.2 },
+      { freq: 293.66, dur: 1.0 },
+      { freq: 261.63, dur: 1.0 },
     ],
     motivasi: [
-      { freq: 329.63, dur: 0.4 }, // E
-      { freq: 392.0, dur: 0.4 }, // G
-      { freq: 523.25, dur: 0.5 }, // C
-      { freq: 587.33, dur: 0.6 }, // D
-      { freq: 659.25, dur: 0.8 }, // E
-      { freq: 587.33, dur: 0.4 }, // D
-      { freq: 523.25, dur: 0.5 }, // C
+      { freq: 329.63, dur: 0.4 },
+      { freq: 392.0, dur: 0.4 },
+      { freq: 523.25, dur: 0.5 },
+      { freq: 587.33, dur: 0.6 },
+      { freq: 659.25, dur: 0.8 },
+      { freq: 587.33, dur: 0.4 },
+      { freq: 523.25, dur: 0.5 },
     ],
     badmood: [
-      { freq: 277.18, dur: 0.9 }, // Cs
-      { freq: 261.63, dur: 0.9 }, // C
-      { freq: 246.94, dur: 1.0 }, // B
-      { freq: 261.63, dur: 0.9 }, // C
-      { freq: 277.18, dur: 1.0 }, // Cs
+      { freq: 277.18, dur: 0.9 },
+      { freq: 261.63, dur: 0.9 },
+      { freq: 246.94, dur: 1.0 },
+      { freq: 261.63, dur: 0.9 },
+      { freq: 277.18, dur: 1.0 },
     ],
   };
 
-  // Play music based on emotion
   useEffect(() => {
     if (!selectedEmotion) return;
 
@@ -83,7 +102,7 @@ const NiaLoveWebsite = () => {
     let isPlaying = true;
     let noteIndex = 0;
 
-    const playNote = (frequency, duration) => {
+    const playNote = (frequency: number, duration: number): void => {
       const osc = audioContext.createOscillator();
       const gain = audioContext.createGain();
 
@@ -103,7 +122,7 @@ const NiaLoveWebsite = () => {
       osc.stop(audioContext.currentTime + duration);
     };
 
-    const playMelody = () => {
+    const playMelody = (): void => {
       if (!isPlaying) return;
 
       const melody = melodyByEmotion[selectedEmotion];
@@ -124,7 +143,7 @@ const NiaLoveWebsite = () => {
     };
   }, [selectedEmotion]);
 
-  const emotions = {
+  const emotions: Record<EmotionType, EmotionStyle> = {
     bahagia: {
       color: "from-blue-300 to-cyan-200",
       dark: "bg-blue-400",
@@ -163,7 +182,7 @@ const NiaLoveWebsite = () => {
     },
   };
 
-  const handleSelectEmotion = (emotion) => {
+  const handleSelectEmotion = (emotion: EmotionType): void => {
     setIsTransitioning(true);
     setTimeout(() => {
       setSelectedEmotion(emotion);
@@ -171,7 +190,7 @@ const NiaLoveWebsite = () => {
     }, 1200);
   };
 
-  const handleBackHome = () => {
+  const handleBackHome = (): void => {
     setIsTransitioning(true);
     setTimeout(() => {
       setSelectedEmotion(null);
@@ -180,7 +199,7 @@ const NiaLoveWebsite = () => {
     }, 1200);
   };
 
-  const messages = {
+  const messages: Record<EmotionType, string[]> = {
     bahagia: [
       "Senyummu adalah alasan aku bahagia setiap hari 💫",
       "Terus bersinar seperti itu, dunia membutuhkan cahayamu",
@@ -202,7 +221,6 @@ const NiaLoveWebsite = () => {
       "Kau istimewa dan patut dibahagiakan",
       "Mari ciptakan lebih banyak momen bahagia bersama",
       "Kau adalah kebahagiaan yang nyata bagiku",
-
       "Melihatmu bahagia membuat hatiku tenang",
       "Tawamu adalah musik favoritku",
       "Setiap senyummu membawa kedamaian",
@@ -223,7 +241,6 @@ const NiaLoveWebsite = () => {
       "Aku senang melihatmu menikmati hidup",
       "Senyummu menyembuhkan lelahku",
       "Kau membuat hatiku penuh rasa syukur",
-
       "Setiap kebahagiaanmu berarti besar bagiku",
       "Aku ingin menjaga senyum itu selamanya",
       "Bahagia di wajahmu adalah pemandangan terbaik",
@@ -266,7 +283,6 @@ const NiaLoveWebsite = () => {
       "Kesedihan ini tidak mendefinisikan siapa dirimu",
       "Kau layak mendapatkan ketenangan dan kedamaian",
       "Aku akan menjadi kekuatanmu sampai kamu menemukan milikmu",
-
       "Tidak apa-apa merasa lelah hari ini",
       "Aku tahu hatimu sedang berat, dan itu wajar",
       "Kesedihanmu tidak membuatmu lemah",
@@ -287,7 +303,6 @@ const NiaLoveWebsite = () => {
       "Hatimu layak diperlakukan dengan lembut",
       "Aku memegang harapan saat kau kehilangannya",
       "Kau tidak sendirian menghadapi rasa ini",
-
       "Beri waktu pada hatimu untuk bernapas",
       "Aku tidak akan pergi meski kau sedang rapuh",
       "Kesedihan ini tidak menghapus cahaya dalam dirimu",
@@ -330,7 +345,6 @@ const NiaLoveWebsite = () => {
       "Kemarahanmu menunjukkan kau peduli",
       "Ambil napas, aku di sini untuk mendukungmu",
       "Kau lebih besar dari kemarahan ini",
-
       "Tak apa jika hatimu sedang panas",
       "Aku tidak takut pada emosimu",
       "Kemarahan ini tidak membuatmu buruk",
@@ -351,7 +365,6 @@ const NiaLoveWebsite = () => {
       "Kemarahan ini tidak menghapus kebaikanmu",
       "Aku percaya kau bisa mengelolanya",
       "Aku tetap melihatmu dengan penuh hormat",
-
       "Tarik napas perlahan, aku menemanimu",
       "Tak apa jika kau butuh waktu",
       "Kemarahan ini bisa jadi awal kejelasan",
@@ -394,7 +407,6 @@ const NiaLoveWebsite = () => {
       "Kelelahan ini adalah sinyal untuk bergerak lebih lambat",
       "Aku akan menjagamu sementara kau beristirahat",
       "Setiap momen istirahat membawamu lebih dekat pada kesehatan",
-
       "Tak apa jika hari ini terasa berat",
       "Kau tidak malas, kau hanya lelah",
       "Istirahat bukan berarti menyerah",
@@ -415,7 +427,6 @@ const NiaLoveWebsite = () => {
       "Biarkan tubuhmu memulihkan diri",
       "Aku bangga pada ketahananmu",
       "Kau layak mendapatkan istirahat tanpa alasan",
-
       "Pejamkan mata, lepaskan hari ini",
       "Tak apa jika kau belum kuat besok",
       "Istirahat adalah bagian dari perjalanan",
@@ -458,7 +469,6 @@ const NiaLoveWebsite = () => {
       "Kemenangan menanti mereka yang berani mencoba",
       "Aku percaya pada versi terbaik darimu",
       "Kau akan mencapai semua yang kau impikan",
-
       "Terus maju meski perlahan",
       "Setiap usaha hari ini membawa dampak esok hari",
       "Kau sedang tumbuh, bahkan saat terasa sulit",
@@ -479,7 +489,6 @@ const NiaLoveWebsite = () => {
       "Setiap tantangan membentuk dirimu",
       "Tetap berdiri meski dunia meragukanmu",
       "Kau mampu melampaui batasmu",
-
       "Keberhasilan dimulai dari keberanian mencoba",
       "Jangan biarkan keraguan menghentikanmu",
       "Potensimu lebih besar dari yang kau sadari",
@@ -522,7 +531,6 @@ const NiaLoveWebsite = () => {
       "Mood buruk ini akan teratasi",
       "Kau lebih dari bad mood hari ini",
       "Besok adalah hari baru penuh dengan kemungkinan",
-
       "Tak apa jika hari ini terasa berat",
       "Kau tidak harus baik-baik saja sekarang",
       "Aku tetap memilih ada di sisimu",
@@ -543,7 +551,6 @@ const NiaLoveWebsite = () => {
       "Bad mood ini hanya singgah sementara",
       "Aku percaya kau bisa melewatinya",
       "Hatimu layak diperlakukan lembut",
-
       "Beri waktu pada dirimu untuk menyesuaikan",
       "Tak apa jika fokusmu berantakan hari ini",
       "Kau tidak berlebihan dengan perasaanmu",
@@ -564,7 +571,6 @@ const NiaLoveWebsite = () => {
       "Tak apa jika emosimu naik turun",
       "Kau lebih kuat dari hari buruk ini",
       "Aku bersamamu melewati suasana ini",
-
       "Pelan-pelan saja, tidak perlu buru-buru",
       "Kau boleh mematikan dunia sejenak",
       "Aku tidak menuntut apa pun darimu",
@@ -578,7 +584,9 @@ const NiaLoveWebsite = () => {
     ],
   };
 
-  const TransitionOverlay = ({ emotion }) => {
+  const TransitionOverlay: React.FC<{ emotion: EmotionType }> = ({
+    emotion,
+  }) => {
     const emotionData = emotions[emotion];
     return (
       <div className="fixed inset-0 z-50 pointer-events-none">
@@ -601,7 +609,7 @@ const NiaLoveWebsite = () => {
     );
   };
 
-  const LoadingScreen = () => {
+  const LoadingScreen: React.FC = () => {
     if (!mounted) {
       return (
         <div className="fixed inset-0 bg-gradient-to-b from-pink-200 via-rose-100 to-pink-50 flex items-center justify-center overflow-hidden z-50">
@@ -695,7 +703,7 @@ const NiaLoveWebsite = () => {
     );
   };
 
-  const HomeScreen = () => (
+  const HomeScreen: React.FC = () => (
     <div className="min-h-screen bg-gradient-to-b from-pink-100 via-rose-50 to-pink-50 animate-fadeIn">
       {isTransitioning && <TransitionOverlay emotion="motivasi" />}
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -710,30 +718,32 @@ const NiaLoveWebsite = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-          {Object.entries(emotions).map(([key, style]) => (
-            <button
-              key={key}
-              onClick={() => handleSelectEmotion(key)}
-              disabled={isTransitioning}
-              className={`bg-gradient-to-br ${style.color} ${style.dark} text-white p-6 rounded-3xl font-bold text-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 hover:-translate-y-2 disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <div className="text-4xl mb-2">
-                {key === "bahagia" && "😊"}
-                {key === "sedih" && "😢"}
-                {key === "marah" && "😠"}
-                {key === "capek" && "😴"}
-                {key === "motivasi" && "💪"}
-                {key === "badmood" && "😑"}
-              </div>
-              <div className="capitalize">
-                {key === "motivasi"
-                  ? "Butuh Motivasi"
-                  : key === "badmood"
-                  ? "Bad Mood"
-                  : key}
-              </div>
-            </button>
-          ))}
+          {(Object.entries(emotions) as [EmotionType, EmotionStyle][]).map(
+            ([key, style]) => (
+              <button
+                key={key}
+                onClick={() => handleSelectEmotion(key)}
+                disabled={isTransitioning}
+                className={`bg-gradient-to-br ${style.color} ${style.dark} text-white p-6 rounded-3xl font-bold text-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 hover:-translate-y-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                <div className="text-4xl mb-2">
+                  {key === "bahagia" && "😊"}
+                  {key === "sedih" && "😢"}
+                  {key === "marah" && "😠"}
+                  {key === "capek" && "😴"}
+                  {key === "motivasi" && "💪"}
+                  {key === "badmood" && "😑"}
+                </div>
+                <div className="capitalize">
+                  {key === "motivasi"
+                    ? "Butuh Motivasi"
+                    : key === "badmood"
+                    ? "Bad Mood"
+                    : key}
+                </div>
+              </button>
+            )
+          )}
         </div>
 
         <div className="mt-16 text-center">
@@ -743,7 +753,9 @@ const NiaLoveWebsite = () => {
     </div>
   );
 
-  const CardScreen = () => {
+  const CardScreen: React.FC = () => {
+    if (!selectedEmotion) return null;
+
     const emotionData = emotions[selectedEmotion];
     const emotionMessages = messages[selectedEmotion] || [];
     const totalCards = 100;
@@ -755,14 +767,15 @@ const NiaLoveWebsite = () => {
       (_, i) => startIdx + i
     );
 
-    const handleCardClick = (index) => {
+    const handleCardClick = (index: number): void => {
       setOpenedCards((prev) => ({
         ...prev,
         [index]: true,
       }));
     };
 
-    const isCardOpened = (index) => openedCards[index] || false;
+    const isCardOpened = (index: number): boolean =>
+      openedCards[index] || false;
     const remainingCards = totalCards - Object.keys(openedCards).length;
 
     return (
@@ -819,11 +832,13 @@ const NiaLoveWebsite = () => {
                       ? `${emotionData.dark} shadow-lg`
                       : "bg-white/40 hover:bg-white/60 shadow-md hover:shadow-xl hover:-translate-y-1"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  style={{
-                    transformStyle: isCardOpened(index)
-                      ? "preserve-3d"
-                      : "flat",
-                  }}
+                  style={
+                    {
+                      transformStyle: isCardOpened(index)
+                        ? "preserve-3d"
+                        : "flat",
+                    } as React.CSSProperties
+                  }
                 >
                   {isCardOpened(index) ? (
                     <div className="text-center h-full flex flex-col items-center justify-center px-3 py-2">
