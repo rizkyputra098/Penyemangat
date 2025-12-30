@@ -45,52 +45,51 @@ const NiaLoveWebsite: React.FC = () => {
 
   const melodyByEmotion: Record<EmotionType, MelodyNote[]> = {
     bahagia: [
-      { freq: 392.0, dur: 0.3 },
-      { freq: 493.88, dur: 0.3 },
-      { freq: 587.33, dur: 0.3 },
-      { freq: 659.25, dur: 0.4 },
-      { freq: 587.33, dur: 0.3 },
-      { freq: 523.25, dur: 0.3 },
-      { freq: 587.33, dur: 0.5 },
+      { freq: 392.0, dur: 0.8 }, // G4
+      { freq: 440.0, dur: 0.9 }, // A4
+      { freq: 493.88, dur: 1.0 }, // B4
+      { freq: 440.0, dur: 0.9 },
+      { freq: 392.0, dur: 1.2 },
     ],
+
     sedih: [
-      { freq: 261.63, dur: 0.8 },
-      { freq: 246.94, dur: 0.8 },
-      { freq: 220.0, dur: 1.0 },
-      { freq: 196.0, dur: 0.6 },
-      { freq: 220.0, dur: 1.0 },
-      { freq: 246.94, dur: 0.8 },
+      { freq: 261.63, dur: 1.4 }, // C4
+      { freq: 246.94, dur: 1.4 }, // B3
+      { freq: 220.0, dur: 1.6 }, // A3
+      { freq: 196.0, dur: 1.8 }, // G3
+      { freq: 220.0, dur: 1.6 },
     ],
+
     marah: [
-      { freq: 329.63, dur: 0.2 },
-      { freq: 392.0, dur: 0.2 },
-      { freq: 329.63, dur: 0.2 },
-      { freq: 440.0, dur: 0.3 },
-      { freq: 329.63, dur: 0.2 },
-      { freq: 392.0, dur: 0.4 },
+      { freq: 293.66, dur: 1.0 }, // D4
+      { freq: 261.63, dur: 1.1 }, // C4
+      { freq: 246.94, dur: 1.2 }, // B3
+      { freq: 261.63, dur: 1.3 },
+      { freq: 293.66, dur: 1.5 },
     ],
+
     capek: [
-      { freq: 261.63, dur: 1.0 },
-      { freq: 293.66, dur: 1.0 },
-      { freq: 329.63, dur: 1.2 },
-      { freq: 293.66, dur: 1.0 },
-      { freq: 261.63, dur: 1.0 },
+      { freq: 261.63, dur: 1.8 }, // C4
+      { freq: 293.66, dur: 1.6 }, // D4
+      { freq: 329.63, dur: 2.0 }, // E4
+      { freq: 293.66, dur: 1.6 },
+      { freq: 261.63, dur: 2.2 },
     ],
+
     motivasi: [
-      { freq: 329.63, dur: 0.4 },
-      { freq: 392.0, dur: 0.4 },
-      { freq: 523.25, dur: 0.5 },
-      { freq: 587.33, dur: 0.6 },
-      { freq: 659.25, dur: 0.8 },
-      { freq: 587.33, dur: 0.4 },
-      { freq: 523.25, dur: 0.5 },
+      { freq: 329.63, dur: 0.9 }, // E4
+      { freq: 392.0, dur: 1.0 }, // G4
+      { freq: 440.0, dur: 1.2 }, // A4
+      { freq: 493.88, dur: 1.4 }, // B4
+      { freq: 523.25, dur: 1.6 }, // C5
     ],
+
     badmood: [
-      { freq: 277.18, dur: 0.9 },
-      { freq: 261.63, dur: 0.9 },
-      { freq: 246.94, dur: 1.0 },
-      { freq: 261.63, dur: 0.9 },
-      { freq: 277.18, dur: 1.0 },
+      { freq: 277.18, dur: 1.4 }, // C#4
+      { freq: 261.63, dur: 1.5 }, // C4
+      { freq: 246.94, dur: 1.6 }, // B3
+      { freq: 261.63, dur: 1.5 },
+      { freq: 277.18, dur: 1.8 },
     ],
   };
 
